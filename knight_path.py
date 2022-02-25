@@ -1,8 +1,18 @@
 
+from configparser import Interpolation
 from dataclasses import dataclass
-
+from typing import List
+import matplotlib.pyplot as plt
+from matplotlib import colors
+import numpy as np
 
 CHESSBOARD_SIZE = 8
+
+@dataclass
+class ChessBoard:
+    pass
+
+
 
 @dataclass
 class Position:
@@ -28,7 +38,14 @@ class Position:
     def __eq__(self, other: object) -> bool:
         return self.row == other.row and self.col == other.col
 
-def generate_possible_moves(start_position):
+    def to_tuple(self):
+        return (self.row, self.col)
+
+    def to_display_tuple(self):
+        return (7 - self.row, self.col)
+
+
+def generate_possible_moves(start_position: Position) -> List[Position]:
     possible_moves = [(2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2), (1, -2), (2, -1)]
     output = []
 
@@ -41,7 +58,8 @@ def generate_possible_moves(start_position):
 
     return output
 
-def calculate_shortest_path(start_pos, target_pos):
+
+def calculate_shortest_path(start_pos: Position, target_pos: Position) -> List[Position]:
     visited = []
     paths = []
 
@@ -80,17 +98,57 @@ def calculate_shortest_path(start_pos, target_pos):
 
     return shortest_path
 
+def plot_path(path: List[str]):
+
+    size = CHESSBOARD_SIZE
+
+    board = [[(x + y) % 2 for x in range(size)] for y in range(size)]
+
+    step = 2
+    for position in path:
+        row, col = position.to_display_tuple()
+        board[row][col] = step
+        step += 1
+
+    # create discrete colormap
+    cmap = colors.ListedColormap(['white', 'black'])
+    cmap.set_over('red')
+
+    fig, ax = plt.subplots()
+    ax.imshow(board, cmap=cmap, interpolation='nearest', vmax=1)
+
+    row_labels = range(size, 0, -1)
+    col_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+
+    for (i, j), z in np.ndenumerate(board):
+        if board[i][j] > 1:
+            ax.text(j, i, f'{board[i][j]-1}', ha='center', va='center')
+
+    ax.set_xticks(range(size), col_labels);
+    ax.set_yticks(range(size), row_labels);
+
+    ax.set_title(f'Start = {path[0]}   Target = {path[-1]}')
+
+    # ax.set_xticks(np.arange(-.5, size, 1), minor=True)
+    # ax.set_yticks(np.arange(-.5, size, 1), minor=True)
+    
+    # ax.grid(which='minor', color='black', linestyle='-', linewidth=2)
+
+    plt.show()
+
     
 def main():
     start_position = Position(0, 1)
     target_position = Position(0, 2)
 
     print(f'start = {start_position}')
-    print(f'finish = {target_position}')
+    print(f'target = {target_position}')
 
-    print(calculate_shortest_path(start_position, target_position))
+    shortest_path = calculate_shortest_path(start_position, target_position)
+
+    print(shortest_path)
+    plot_path(shortest_path)
     
-
 
 if __name__ == "__main__":
     main()

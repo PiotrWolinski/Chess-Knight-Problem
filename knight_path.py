@@ -10,11 +10,39 @@ CHESSBOARD_SIZE = 8
 
 @dataclass
 class ChessBoard:
-    pass
+    """Class representing chessboard to make path finding algorithm more flexible.
+    Assumption is that the board is square
+
+    Arguments:
+        length: int - amount of cells in one row/colum. 
+    """
+    
+    length: int
+
+    def get_rows_label(self, inverted=False):
+        if not inverted:
+            return [x for x in range(self.length, 0, -1)]
+            
+        return [x for x in range(1, self.length+1)]
+
+    def get_columns_label(self, inverted=False):
+        if not inverted:
+            return [chr(x + 97) for x in range(self.length)]
+
+        return [chr(x + 97) for x in range(self.length - 1, -1, -1)]
+
+    @property
+    def board(self):
+        """
+        Returns two dimensional list to represent chessboard.
+        0 for white tile, and 1 for black tile.
+        
+        """
+        
+        return [[(x + y) % 2 for x in range(self.length)] for y in range(self.length)]
 
 
-
-@dataclass
+@dataclass(repr=False, eq=False)
 class Position:
     """Class for holding position on the chessboard
     For the ease of implementation it will be initialized
@@ -25,8 +53,8 @@ class Position:
     Postion(row=0, col=1) == b1
     
     Keyword arguments:
-    row -- int for the row index
-    col -- int for the col index
+    row: int - the row index
+    col: int - the col index
     """
     
     row: int
@@ -59,12 +87,12 @@ def generate_possible_moves(start_position: Position) -> List[Position]:
     return output
 
 
-def calculate_shortest_path(start_pos: Position, target_pos: Position) -> List[Position]:
+def calculate_shortest_path(start_pos: Position, target_pos: Position, chessboard: ChessBoard) -> List[Position]:
     visited = []
     paths = []
 
     queue = [[start_pos]]
-    while len(queue) != 0 and len(visited) != CHESSBOARD_SIZE ** 2:
+    while len(queue) != 0 and len(visited) != chessboard.length ** 2:
         current_path = queue.pop(0)
         last_position = current_path[-1]
 
@@ -90,7 +118,7 @@ def calculate_shortest_path(start_pos: Position, target_pos: Position) -> List[P
             queue.append(new_path)
 
     
-    shortest_path = ['' for _ in range(CHESSBOARD_SIZE ** 2)]
+    shortest_path = ['' for _ in range(chessboard.length ** 2)]
 
     for path in paths:
         if len(path) < len(shortest_path):
@@ -98,11 +126,11 @@ def calculate_shortest_path(start_pos: Position, target_pos: Position) -> List[P
 
     return shortest_path
 
-def plot_path(path: List[str]):
+def plot_path(path: List[str], chessboard: ChessBoard):
 
-    size = CHESSBOARD_SIZE
+    size = chessboard.length
 
-    board = [[(x + y) % 2 for x in range(size)] for y in range(size)]
+    board = chessboard.board
 
     step = 2
     for position in path:
@@ -117,8 +145,8 @@ def plot_path(path: List[str]):
     fig, ax = plt.subplots()
     ax.imshow(board, cmap=cmap, interpolation='nearest', vmax=1)
 
-    row_labels = range(size, 0, -1)
-    col_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    row_labels = chessboard.get_rows_label()
+    col_labels = chessboard.get_columns_label()
 
     for (i, j), z in np.ndenumerate(board):
         if board[i][j] > 1:
@@ -128,26 +156,34 @@ def plot_path(path: List[str]):
     ax.set_yticks(range(size), row_labels);
 
     ax.set_title(f'Start = {path[0]}   Target = {path[-1]}')
-
-    # ax.set_xticks(np.arange(-.5, size, 1), minor=True)
-    # ax.set_yticks(np.arange(-.5, size, 1), minor=True)
-    
-    # ax.grid(which='minor', color='black', linestyle='-', linewidth=2)
-
     plt.show()
 
     
 def main():
+    chessboard = ChessBoard(length=8)
+
     start_position = Position(0, 1)
     target_position = Position(0, 2)
 
     print(f'start = {start_position}')
     print(f'target = {target_position}')
 
-    shortest_path = calculate_shortest_path(start_position, target_position)
+    shortest_path = calculate_shortest_path(start_position, target_position, chessboard)
+
 
     print(shortest_path)
-    plot_path(shortest_path)
+    plot_path(shortest_path, chessboard)
+
+    # row = chessboard.get_rows_label()
+    # row_inv = chessboard.get_rows_label(inverted=True)
+
+    # col = chessboard.get_columns_label()
+    # col_inv = chessboard.get_columns_label(inverted=True)
+
+    # print(f'row = {row}')
+    # print(f'row inverted = {row_inv}')
+    # print(f'col = {col}')
+    # print(f'col inverted = {col_inv}')
     
 
 if __name__ == "__main__":

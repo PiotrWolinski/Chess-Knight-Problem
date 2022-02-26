@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import List
 import matplotlib.pyplot as plt
 from matplotlib import colors
-import numpy as np
 
 
 @dataclass
@@ -147,9 +146,10 @@ def plot_path(path: List[str], chessboard: ChessBoard):
     row_labels = chessboard.get_rows_label()
     col_labels = chessboard.get_columns_label()
 
-    for (i, j), z in np.ndenumerate(board):
-        if board[i][j] > 1:
-            ax.text(j, i, f'{board[i][j]-1}', ha='center', va='center')
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            if board[i][j] > 1:
+                ax.text(j, i, f'{board[i][j]-1}', ha='center', va='center')
 
     ax.set_xticks(range(size), col_labels);
     ax.set_yticks(range(size), row_labels);

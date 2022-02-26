@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 import numpy as np
 
-CHESSBOARD_SIZE = 8
 
 @dataclass
 class ChessBoard:
@@ -92,7 +91,7 @@ def calculate_shortest_path(start_pos: Position, target_pos: Position, chessboar
     paths = []
 
     queue = [[start_pos]]
-    while len(queue) != 0 and len(visited) != chessboard.length ** 2:
+    while len(queue) != 0:
         current_path = queue.pop(0)
         last_position = current_path[-1]
 
@@ -112,11 +111,10 @@ def calculate_shortest_path(start_pos: Position, target_pos: Position, chessboar
                 visited.append(position)
         
         # Generate new paths from the current position
-        for next_position in possible_moves:
+        for next_position in actual_moves:
             new_path = current_path[:]
             new_path.append(next_position)
             queue.append(new_path)
-
     
     shortest_path = ['' for _ in range(chessboard.length ** 2)]
 
@@ -138,7 +136,7 @@ def plot_path(path: List[str], chessboard: ChessBoard):
         board[row][col] = step
         step += 1
 
-    # create discrete colormap
+    # Create discrete colormap
     cmap = colors.ListedColormap(['white', 'black'])
     cmap.set_over('red')
 
@@ -163,27 +161,15 @@ def main():
     chessboard = ChessBoard(length=8)
 
     start_position = Position(0, 1)
-    target_position = Position(0, 2)
+    target_position = Position(6, 5)
 
     print(f'start = {start_position}')
     print(f'target = {target_position}')
 
     shortest_path = calculate_shortest_path(start_position, target_position, chessboard)
 
-
     print(shortest_path)
     plot_path(shortest_path, chessboard)
-
-    # row = chessboard.get_rows_label()
-    # row_inv = chessboard.get_rows_label(inverted=True)
-
-    # col = chessboard.get_columns_label()
-    # col_inv = chessboard.get_columns_label(inverted=True)
-
-    # print(f'row = {row}')
-    # print(f'row inverted = {row_inv}')
-    # print(f'col = {col}')
-    # print(f'col inverted = {col_inv}')
     
 
 if __name__ == "__main__":

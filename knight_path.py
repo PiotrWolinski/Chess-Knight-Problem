@@ -159,17 +159,20 @@ def plot_path(path: List[str], chessboard: ChessBoard):
 
     
 def main():
+    # Define chessboard that will be used to solve the problem
     chessboard = ChessBoard(length=8)
 
+    # Define start and target position for the knight
     start_position = Position(0, 1, board_size=chessboard.length)
     target_position = Position(6, 5, board_size=chessboard.length)
 
     print(f'start = {start_position}')
     print(f'target = {target_position}')
 
+    # Calculate the shortest path using BFS algorithm
     shortest_path = calculate_shortest_path(start_position, target_position, chessboard)
 
-    print(shortest_path)
+    # Plot path on the chessboard
     plot_path(shortest_path, chessboard)
     
 

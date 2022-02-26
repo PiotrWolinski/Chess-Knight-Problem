@@ -1,7 +1,7 @@
 
 from configparser import Interpolation
 from dataclasses import dataclass
-from typing import List
+from typing import List, Tuple
 import matplotlib.pyplot as plt
 from matplotlib import colors
 
@@ -17,20 +17,20 @@ class ChessBoard:
     
     length: int
 
-    def get_rows_label(self, inverted=False):
+    def get_rows_label(self, inverted: bool=False) -> List:
         if not inverted:
             return [x for x in range(self.length, 0, -1)]
             
         return [x for x in range(1, self.length+1)]
 
-    def get_columns_label(self, inverted=False):
+    def get_columns_label(self, inverted: bool=False) -> List:
         if not inverted:
             return [chr(x + 97) for x in range(self.length)]
 
         return [chr(x + 97) for x in range(self.length - 1, -1, -1)]
 
     @property
-    def board(self):
+    def board(self) -> List[List]:
         """
         Returns two dimensional list to represent chessboard.
         0 for white tile, and 1 for black tile.
@@ -65,10 +65,10 @@ class Position:
     def __eq__(self, other: object) -> bool:
         return self.row == other.row and self.col == other.col
 
-    def to_tuple(self):
+    def to_tuple(self) -> Tuple:
         return (self.row, self.col)
 
-    def to_display_tuple(self):
+    def to_display_tuple(self) -> Tuple:
         return (self.board_size - 1 - self.row, self.col)
 
 
@@ -124,7 +124,7 @@ def calculate_shortest_path(start_pos: Position, target_pos: Position, chessboar
 
     return shortest_path
 
-def plot_path(path: List[str], chessboard: ChessBoard):
+def plot_path(path: List[str], chessboard: ChessBoard) -> None:
 
     size = chessboard.length
 
@@ -158,7 +158,7 @@ def plot_path(path: List[str], chessboard: ChessBoard):
     plt.show()
 
     
-def main():
+def main() -> None:
     # Define chessboard that will be used to solve the problem
     chessboard = ChessBoard(length=8)
 

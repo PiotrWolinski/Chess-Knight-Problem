@@ -58,6 +58,7 @@ class Position:
     
     row: int
     col: int
+    board_size: int
 
     def __repr__(self):
         return f'{chr(self.col + 97)}{self.row + 1}'
@@ -69,10 +70,10 @@ class Position:
         return (self.row, self.col)
 
     def to_display_tuple(self):
-        return (7 - self.row, self.col)
+        return (self.board_size - 1 - self.row, self.col)
 
 
-def generate_possible_moves(start_position: Position) -> List[Position]:
+def generate_possible_moves(start_position: Position, board_size: int) -> List[Position]:
     possible_moves = [(2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2), (1, -2), (2, -1)]
     output = []
 
@@ -81,7 +82,7 @@ def generate_possible_moves(start_position: Position) -> List[Position]:
 
     for row_move, col_move in possible_moves:
         if 7 >= row + row_move >= 0 and 7 >= col + col_move >= 0:
-            output.append(Position(row + row_move, col + col_move))
+            output.append(Position(row + row_move, col + col_move, board_size))
 
     return output
 
@@ -101,7 +102,7 @@ def calculate_shortest_path(start_pos: Position, target_pos: Position, chessboar
             continue
 
         # Check possible moves from the current position
-        possible_moves = generate_possible_moves(last_position)
+        possible_moves = generate_possible_moves(last_position, chessboard.length)
         actual_moves = []
 
         # Check if generated positions were not visited earlier
@@ -160,8 +161,8 @@ def plot_path(path: List[str], chessboard: ChessBoard):
 def main():
     chessboard = ChessBoard(length=8)
 
-    start_position = Position(0, 1)
-    target_position = Position(6, 5)
+    start_position = Position(0, 1, board_size=chessboard.length)
+    target_position = Position(6, 5, board_size=chessboard.length)
 
     print(f'start = {start_position}')
     print(f'target = {target_position}')

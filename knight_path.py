@@ -6,6 +6,38 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 
 
+
+
+@dataclass(repr=False, eq=False)
+class Position:
+    """Class for holding position on the chessboard
+    For the ease of implementation it will be initialized
+    and operated on indexes from 0 to 7, but string representation
+    will be adapted to chess notation.
+
+    Position(row=2, col=3) == d3
+    Postion(row=0, col=1) == b1
+    
+    Arguments:
+        row: int - the row index
+        col: int - the col index
+    """
+    
+    row: int
+    col: int
+    board_size: int
+
+    def __repr__(self):
+        return f'{chr(self.col + 97)}{self.row + 1}'
+
+    def __eq__(self, other: object) -> bool:
+        return self.row == other.row and self.col == other.col
+
+    def to_tuple(self) -> Tuple:
+        return (self.row, self.col)
+
+    def to_display_tuple(self) -> Tuple:
+        return (self.board_size - 1 - self.row, self.col)
 @dataclass
 class ChessBoard:
     """Class representing chessboard to make path finding algorithm more flexible.
@@ -29,6 +61,15 @@ class ChessBoard:
 
         return [chr(x + 97) for x in range(self.length - 1, -1, -1)]
 
+    def check_position(self, position: Position) -> bool:
+        """Checks if given position is valid in terms of current chessboard
+        
+        Arguments:
+            position: Position -- position to check
+        Return: return_description
+        """
+        
+
     @property
     def board(self) -> List[List]:
         """
@@ -38,38 +79,6 @@ class ChessBoard:
         """
         
         return [[(x + y) % 2 for x in range(self.length)] for y in range(self.length)]
-
-
-@dataclass(repr=False, eq=False)
-class Position:
-    """Class for holding position on the chessboard
-    For the ease of implementation it will be initialized
-    and operated on indexes from 0 to 7, but string representation
-    will be adapted to chess notation.
-
-    Position(row=2, col=3) == d3
-    Postion(row=0, col=1) == b1
-    
-    Keyword arguments:
-    row: int - the row index
-    col: int - the col index
-    """
-    
-    row: int
-    col: int
-    board_size: int
-
-    def __repr__(self):
-        return f'{chr(self.col + 97)}{self.row + 1}'
-
-    def __eq__(self, other: object) -> bool:
-        return self.row == other.row and self.col == other.col
-
-    def to_tuple(self) -> Tuple:
-        return (self.row, self.col)
-
-    def to_display_tuple(self) -> Tuple:
-        return (self.board_size - 1 - self.row, self.col)
 
 
 def generate_possible_moves(start_position: Position, board_size: int) -> List[Position]:
@@ -87,6 +96,18 @@ def generate_possible_moves(start_position: Position, board_size: int) -> List[P
 
 
 def calculate_shortest_path(start_pos: Position, target_pos: Position, chessboard: ChessBoard) -> List[Position]:
+    """Returns list of positions that will make the path from the start_pos to the target_pos, 
+    start_pos is included as the first element.
+    
+    Arguments:
+        start_pos: Position - position on which knight starts the path
+        target_pos: Position - position which knight needs to finish on
+        chessboard: ChessBoard - object representing chessboard on which the task is conducted
+
+    Return:
+        List[Position]
+    """
+    
     visited = []
     paths = []
 

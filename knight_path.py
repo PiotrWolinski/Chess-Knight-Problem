@@ -1,5 +1,4 @@
 
-from configparser import Interpolation
 from dataclasses import dataclass
 from typing import List, Tuple
 import matplotlib.pyplot as plt
@@ -7,8 +6,6 @@ from matplotlib import colors
 
 
 
-
-@dataclass(repr=False, eq=False)
 class Position:
     """Class for holding position on the chessboard
     For the ease of implementation it will be initialized
@@ -22,22 +19,39 @@ class Position:
         row: int - the row index
         col: int - the col index
     """
-    
-    row: int
-    col: int
-    board_size: int
+
+    def __init__(self, row: int, col: int, board_size: int):
+        if row >= board_size or row < 0:
+            raise ValueError('Incorrect row index') 
+
+        if col >= board_size or col < 0:
+            raise ValueError('Incorrect col index')
+
+        self._row = row
+        self._col = col
+        self.board_size = board_size
+
+    @property
+    def row(self) -> int:
+        return self._row
+
+    @property
+    def col(self) -> int:
+        return self._col
 
     def __repr__(self):
-        return f'{chr(self.col + 97)}{self.row + 1}'
+        return f'{chr(self._col + 97)}{self._row + 1}'
 
     def __eq__(self, other: object) -> bool:
-        return self.row == other.row and self.col == other.col
+        return self._row == other.row and self._col == other.col
 
     def to_tuple(self) -> Tuple:
-        return (self.row, self.col)
+        return (self._row, self._col)
 
     def to_display_tuple(self) -> Tuple:
-        return (self.board_size - 1 - self.row, self.col)
+        return (self.board_size - 1 - self._row, self._col)
+
+
 @dataclass
 class ChessBoard:
     """Class representing chessboard to make path finding algorithm more flexible.
@@ -59,7 +73,7 @@ class ChessBoard:
         if not inverted:
             return [chr(x + 97) for x in range(self.length)]
 
-        return [chr(x + 97) for x in range(self.length - 1, -1, -1)]
+        return [chr(x + 97) for x in range(self.length-1, -1, -1)]
 
     def check_position(self, position: Position) -> bool:
         """Checks if given position is valid in terms of current chessboard
@@ -69,7 +83,10 @@ class ChessBoard:
         Return: return_description
         """
         
+        row, col = position.to_tuple()
 
+        return row >= 0 and row < self.length and col >= 0 and col < self.length
+        
     @property
     def board(self) -> List[List]:
         """
@@ -81,12 +98,11 @@ class ChessBoard:
         return [[(x + y) % 2 for x in range(self.length)] for y in range(self.length)]
 
 
-def generate_possible_moves(start_position: Position, board_size: int) -> List[Position]:
+def generate_possible_moves(position: Position, board_size: int) -> List[Position]:
     possible_moves = [(2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2), (1, -2), (2, -1)]
     output = []
 
-    row = start_position.row
-    col = start_position.col
+    row, col = position.to_tuple()
 
     for row_move, col_move in possible_moves:
         if 7 >= row + row_move >= 0 and 7 >= col + col_move >= 0:

@@ -1,9 +1,10 @@
 
-from dataclasses import dataclass
+from __future__ import annotations
+
 from typing import List, Tuple
+
 import matplotlib.pyplot as plt
 from matplotlib import colors
-
 
 
 class Position:
@@ -39,11 +40,30 @@ class Position:
     def col(self) -> int:
         return self._col
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{chr(self._col + 97)}{self._row + 1}'
 
     def __eq__(self, other: object) -> bool:
         return self._row == other.row and self._col == other.col
+
+    @classmethod
+    def parse_from_str(cls, position_str: str, board_size: int) -> Position:
+        if not position_str:
+            raise ValueError('Empty string or None passed to string position parser')
+
+        STR_LEN = 2 if board_size < 10 else 3
+
+        if len(position_str) != STR_LEN:
+            raise ValueError('Incorrect string size')
+
+        position_str = position_str.lower()
+
+        col = ord(position_str[0]) - 97
+        row = int(position_str[1:]) - 1
+
+        pos = cls(row, col, board_size)
+
+        return pos
 
     def to_tuple(self) -> Tuple:
         return (self._row, self._col)
@@ -52,16 +72,20 @@ class Position:
         return (self.board_size - 1 - self._row, self._col)
 
 
-@dataclass
 class ChessBoard:
     """Class representing chessboard to make path finding algorithm more flexible.
-    Assumption is that the board is square
+    Assumption is that the board is square. 
+
+    Max size of the chess board is set to 26x26, to keep it clean with labeling.
 
     Arguments:
         length: int - amount of cells in one row/colum. 
     """
-    
-    length: int
+
+    MAX_LENGTH = 26
+
+    def __init__(self, length: int) -> None:
+        self.length = length if length < self.MAX_LENGTH else self.MAX_LENGTH
 
     def get_rows_label(self, inverted: bool=False) -> List:
         if not inverted:
@@ -89,10 +113,8 @@ class ChessBoard:
         
     @property
     def board(self) -> List[List]:
-        """
-        Returns two dimensional list to represent chessboard.
+        """Returns two dimensional list to represent chessboard.
         0 for white tile, and 1 for black tile.
-        
         """
         
         return [[(x + y) % 2 for x in range(self.length)] for y in range(self.length)]
@@ -167,6 +189,7 @@ def plot_path(path: List[str], chessboard: ChessBoard) -> None:
 
     board = chessboard.board
 
+    # Set to 2, so it can be distinguished from the black and white tiles
     step = 2
     for position in path:
         row, col = position.to_display_tuple()
@@ -177,7 +200,7 @@ def plot_path(path: List[str], chessboard: ChessBoard) -> None:
     cmap = colors.ListedColormap(['white', 'black'])
     cmap.set_over('red')
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     ax.imshow(board, cmap=cmap, interpolation='nearest', vmax=1)
 
     row_labels = chessboard.get_rows_label()

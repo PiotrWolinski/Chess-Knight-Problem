@@ -1,6 +1,7 @@
 
 from __future__ import annotations
 
+import argparse
 from typing import List, Tuple
 
 import matplotlib.pyplot as plt
@@ -72,20 +73,30 @@ class Position:
         return (self.board_size - 1 - self._row, self._col)
 
 
-class ChessBoard:
+class Chessboard:
     """Class representing chessboard to make path finding algorithm more flexible.
     Assumption is that the board is square. 
 
-    Max size of the chess board is set to 26x26, to keep it clean with labeling.
+    Max size of the chess board is set to 26x26, to keep it clean with labeling
+    and min size is 4x4, so that the knight will have place to move.
 
     Arguments:
         length: int - amount of cells in one row/colum. 
     """
 
     MAX_LENGTH = 26
+    MIN_LENGTH = 4
 
     def __init__(self, length: int) -> None:
-        self.length = length if length < self.MAX_LENGTH else self.MAX_LENGTH
+        if length < self.MIN_LENGTH:
+            self.length = self.MIN_LENGTH
+            return
+        
+        if length > self.MAX_LENGTH:
+            self.length = self.MAX_LENGTH
+            return
+
+        self.length = length
 
     def get_rows_label(self, inverted: bool=False) -> List:
         if not inverted:
@@ -127,20 +138,20 @@ def generate_possible_moves(position: Position, board_size: int) -> List[Positio
     row, col = position.to_tuple()
 
     for row_move, col_move in possible_moves:
-        if 7 >= row + row_move >= 0 and 7 >= col + col_move >= 0:
+        if board_size-1 >= row + row_move >= 0 and board_size-1 >= col + col_move >= 0:
             output.append(Position(row + row_move, col + col_move, board_size))
 
     return output
 
 
-def calculate_shortest_path(start_pos: Position, target_pos: Position, chessboard: ChessBoard) -> List[Position]:
+def calculate_shortest_path(start_pos: Position, target_pos: Position, chessboard: Chessboard) -> List[Position]:
     """Returns list of positions that will make the path from the start_pos to the target_pos, 
     start_pos is included as the first element.
     
     Arguments:
         start_pos: Position - position on which knight starts the path
         target_pos: Position - position which knight needs to finish on
-        chessboard: ChessBoard - object representing chessboard on which the task is conducted
+        chessboard: Chessboard - object representing chessboard on which the task is conducted
 
     Return:
         List[Position]
@@ -183,7 +194,7 @@ def calculate_shortest_path(start_pos: Position, target_pos: Position, chessboar
 
     return shortest_path
 
-def plot_path(path: List[str], chessboard: ChessBoard) -> None:
+def plot_path(path: List[str], chessboard: Chessboard) -> None:
 
     size = chessboard.length
 
@@ -217,14 +228,55 @@ def plot_path(path: List[str], chessboard: ChessBoard) -> None:
     ax.set_title(f'Start = {path[0]}   Target = {path[-1]}')
     plt.show()
 
+def handle_input(default: bool=True) -> Tuple[Position, Position, Chessboard]:
     
-def main() -> None:
-    # Define chessboard that will be used to solve the problem
-    chessboard = ChessBoard(length=8)
+    chessboard = None
+    start_position = None
+    target_position = None
 
-    # Define start and target position for the knight
-    start_position = Position(0, 1, board_size=chessboard.length)
-    target_position = Position(6, 5, board_size=chessboard.length)
+    if default:
+        # Define chessboard that will be used to solve the problem
+        chessboard = Chessboard(length=8)
+
+        # Define start and target position for the knight
+        start_position = Position(0, 1, board_size=chessboard.length)
+        target_position = Position(6, 5, board_size=chessboard.length)
+    else:
+        print('Provide chessboard size (standard is 8)')
+        size = int(input('> '))
+
+        chessboard = Chessboard(length=size)
+
+        print('Enter starting position in chess notation (ex. a2)')
+        print('Just make sure it fits on Your chessboard!')
+        start_pos_str = input('> ')
+
+        start_position = Position.parse_from_str(start_pos_str, chessboard.length)
+
+        print('Enter target position in chess notation (ex. a2')
+        print('Just make sure it fits on Your chessboard!')
+        target_pos_str = input('> ')
+
+        target_position = Position.parse_from_str(target_pos_str, chessboard.length)
+
+    return start_position, target_position, chessboard
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--default', action='store_true', default=False)
+
+    # TODO -- Add user input and split to files
+
+    args = parser.parse_args()
+
+    # # Define chessboard that will be used to solve the problem
+    # chessboard = Chessboard(length=2)
+
+    # # Define start and target position for the knight
+    # start_position = Position(0, 1, board_size=chessboard.length)
+    # target_position = Position(1, 3, board_size=chessboard.length)
+
+    start_position, target_position, chessboard = handle_input(default=args.default)
 
     print(f'start = {start_position}')
     print(f'target = {target_position}')

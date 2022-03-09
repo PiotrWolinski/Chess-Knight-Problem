@@ -194,6 +194,7 @@ def calculate_shortest_path(start_pos: Position, target_pos: Position, chessboar
 
     return shortest_path
 
+
 def plot_path(path: List[str], chessboard: Chessboard) -> None:
 
     size = chessboard.length
@@ -228,6 +229,7 @@ def plot_path(path: List[str], chessboard: Chessboard) -> None:
     ax.set_title(f'Start = {path[0]}   Target = {path[-1]}')
     plt.show()
 
+
 def handle_input(default: bool=True) -> Tuple[Position, Position, Chessboard]:
     
     chessboard = None
@@ -261,20 +263,11 @@ def handle_input(default: bool=True) -> Tuple[Position, Position, Chessboard]:
 
     return start_position, target_position, chessboard
 
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--default', action='store_true', default=False)
-
-    # TODO -- Add user input and split to files
-
     args = parser.parse_args()
-
-    # # Define chessboard that will be used to solve the problem
-    # chessboard = Chessboard(length=2)
-
-    # # Define start and target position for the knight
-    # start_position = Position(0, 1, board_size=chessboard.length)
-    # target_position = Position(1, 3, board_size=chessboard.length)
 
     start_position, target_position, chessboard = handle_input(default=args.default)
 

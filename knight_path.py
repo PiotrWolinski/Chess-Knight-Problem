@@ -115,7 +115,8 @@ class Chessboard:
         
         Arguments:
             position: Position -- position to check
-        Return: return_description
+        Return: 
+            xjbool - boolean if the given position is valid for this chessboard
         """
         
         row, col = position.to_tuple()
@@ -132,6 +133,15 @@ class Chessboard:
 
 
 def generate_possible_moves(position: Position, board_size: int) -> List[Position]:
+    """Returns list of possible positions for the knight, based on the current position.
+    
+    Arguments:
+        position: Position - position from which the knight will move
+
+    Return: 
+        List[Position]
+    """
+    
     possible_moves = [(2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2), (1, -2), (2, -1)]
     output = []
 

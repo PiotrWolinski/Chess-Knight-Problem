@@ -6,17 +6,27 @@ Chess Knight Tour</a> Visualizer</h1>
 </p>
   
 ***
-## Overview
 
-### Stack
+# Overview
+
+## Stack
 
 Solution to shortest knight tour problem done using `python 3.9`, visualization is done using `matplotlib`. 
 
-### Approach
+## Approach
+
 Algorithm used here is a little bit modified [BFS](https://en.wikipedia.org/wiki/Breadth-first_search) on the graph of all the possible moves that the knight might take.
 
-### Install requirements
+## Install requirements
+
 `pip install -r requirements.txt`  
 
-### Run visualization
+## Run visualization
+
+### With default start and finish positions
+
+`python knight_path.py --default`
+
+### With prompt to provide all the dimensions
+
 `python knight_path.py`

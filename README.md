@@ -27,6 +27,6 @@ Algorithm used here is a little bit modified [BFS](https://en.wikipedia.org/wiki
 
 `python knight_path.py --default`
 
-### With prompt to provide all the dimensions
+### With prompt to provide all the parameters
 
 `python knight_path.py`
